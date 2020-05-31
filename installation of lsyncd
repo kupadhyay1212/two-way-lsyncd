@@ -1,0 +1,60 @@
+Realtime File synchronisation between multiple servers in multi master mode
+There is a good tool called lsyncd to sync files between multiple servers on real time basis. Here I have tried with two servers.
+
+Hosts: Server1 and Server2
+
+OS Used: CentOS 7
+
+Install below packages on both the servers.
+
+# yum install -y epel-release
+# yum -y install lua lua-devel pkgconfig gcc asciidoc lsyncd
+generate ssh-key in both the servers and add to authorized_keys file. [add public key of server1 to server2's authorized_keys and public key of server2 to server1's authorized_keys file]
+
+Server1 configuration
+Open /etc/lsyncd.conf and comment out the default configuration using -- at the beginning of the line and add below configuration to the file.
+<< vi /etc/lsyncd.conf
+
+settings {
+  logfile = "/var/log/lsyncd/lsyncd.log",
+  statusFile = "/var/log/lsyncd.stat",
+  statusInterval = 2,
+
+}
+sync {
+  default.rsync,
+  source="/home/test/public_html/",
+  target="server2:/home/test/public_html/",
+  exclude = {'.env','test.txt'},
+rsync = {
+    compress = true,
+    acls = true,
+    verbose = true,
+    owner = true,
+    group = true,
+    perms = true,
+    rsh = "/usr/bin/ssh -p 22 -o StrictHostKeyChecking=no"
+  }
+}
+
+
+and save it.
+
+Change the target IP in target parameter.
+here the i mention the exclude files ('.env',test.txt) which i don't want to copy to target folder
+
+You can change the delay parameter as per your requirement. Here it is set 1 second.
+
+Now create the log directory.
+
+# mkdir -p /var/log/lsyncd
+Enable the lsyncd service to start automatically.
+
+# systemctl enable lsyncd.service
+Start the service.
+# by more cmd u can see the status of lsyncd
+more /var/log/lsyncd.stat
+# systemctl start lsyncd.service
+Server2 Configuration
+Follow the same configuration as Server1 and change the target IP.
+
