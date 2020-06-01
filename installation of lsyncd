@@ -38,6 +38,32 @@ rsync = {
 }
 
 
+for other non-default root user and port
+
+settings {
+  logfile = "/var/log/lsyncd/lsyncd.log",
+  statusFile = "/var/log/lsyncd.stat",
+  statusInterval = 2,
+}
+sync {
+  default.rsync,
+  source="/test/",
+  target="nrmdevuser@server2:/test/",
+  exclude = {'.env','test.txt'},
+rsync = {
+    compress = true,
+    acls = true,
+    verbose = true,
+    owner = true,
+    group = true,
+    perms = true,
+    rsh = "/usr/bin/ssh -p 3153 -o StrictHostKeyChecking=no"
+  }
+}
+
+
+
+
 and save it.
 
 Change the target IP in target parameter.
