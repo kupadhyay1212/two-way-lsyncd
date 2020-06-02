@@ -15,6 +15,7 @@ Server1 configuration
 Open /etc/lsyncd.conf and comment out the default configuration using -- at the beginning of the line and add below configuration to the file.
 << vi /etc/lsyncd.conf
 
+## this will by deafult delete the clinet server excluded files
 settings {
   logfile = "/var/log/lsyncd/lsyncd.log",
   statusFile = "/var/log/lsyncd.stat",
@@ -37,8 +38,36 @@ rsync = {
   }
 }
 
+## This will not delete any files from clinet server, i prefre this congiguration for production server
 
-for other non-default root user and port
+
+settings {
+  logfile = "/var/log/lsyncd/lsyncd.log",
+  statusFile = "/var/log/lsyncd-status.log",
+  statusInterval = 5,
+}
+sync {
+  default.rsync,
+  source="/data/",
+  target="server2:/data/",
+  exclude = {'.env','test'},
+  delay=10,
+  delete = false,
+  rsync = {
+    compress = true,
+    acls = true,
+    verbose = true,
+    owner = true,
+    group = true,
+    perms = true,
+    rsh = "/usr/bin/ssh -p 22 -o StrictHostKeyChecking=no"
+  }
+}
+
+
+
+
+###for other non-default root user and port
 
 settings {
   logfile = "/var/log/lsyncd/lsyncd.log",
